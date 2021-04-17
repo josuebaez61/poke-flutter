@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:poke_flutter/helpers/functions.dart';
+import 'package:poke_flutter/models/pokemon.dart';
 import 'package:poke_flutter/models/simplified_pokemon.dart';
 import 'package:poke_flutter/providers/pokemon_provider.dart';
 import 'package:poke_flutter/widgets/custom_appbar.dart';
@@ -19,8 +21,12 @@ class PokemonScreen extends StatelessWidget {
       body: Container(
         width: double.infinity,
         child: Column(
+          // mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            PokemonHeader(),
+            _PokemonHeader(),
+            _PokemonDescription(
+              pokemonId: simplifiedPokemon.id,
+            ),
           ],
         ),
       ),
@@ -28,7 +34,7 @@ class PokemonScreen extends StatelessWidget {
   }
 }
 
-class PokemonHeader extends StatelessWidget {
+class _PokemonHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final SimplifiedPokemon simplifiedPokemon = ModalRoute.of(context).settings.arguments;
@@ -61,6 +67,78 @@ class PokemonHeader extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _PokemonDescription extends StatelessWidget {
+  final PokemonProvider pokemonProvider = PokemonProvider();
+  final String pokemonId;
+
+  _PokemonDescription({@required this.pokemonId});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.only(top: 40.0),
+      child: FutureBuilder(
+        future: pokemonProvider.getPokemonById(pokemonId),
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+          if (snapshot.hasData) {
+            Pokemon pokemon = snapshot.data;
+            List<Ability> abilitiesArray = pokemon.abilities;
+            List<Type> typesArray = pokemon.types;
+
+            String joinedAbilities =
+                abilitiesArray.map((ab) => capitalize(ab.ability.name)).toList().join(', ');
+
+            String joinedTypes =
+                typesArray.map((ab) => capitalize(ab.type.name)).toList().join(', ');
+
+            return Container(
+              padding: EdgeInsets.symmetric(horizontal: 5.0),
+              child: Row(
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Types',
+                        style: Theme.of(context).textTheme.headline6,
+                      ),
+                      Text(
+                        joinedTypes,
+                      ),
+                      SizedBox(
+                        height: 10.0,
+                      ),
+                      Text(
+                        'Abilities',
+                        style: Theme.of(context).textTheme.headline6,
+                      ),
+                      Text(
+                        joinedAbilities,
+                      ),
+                      SizedBox(
+                        height: 10.0,
+                      ),
+                      Text(
+                        'Weight',
+                        style: Theme.of(context).textTheme.headline6,
+                      ),
+                      Text(
+                        pokemon.weight.toString(),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            );
+          } else {
+            return Container();
+          }
+        },
+      ),
     );
   }
 }

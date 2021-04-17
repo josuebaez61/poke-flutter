@@ -11,24 +11,6 @@ class PokemonProvider {
   String officialArtWorkUrl =
       'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/';
 
-  // Future<List<Pokemon>> getPokemons() async {
-  //   final Uri url = Uri.https(baseUrl, '/api/v2/pokemon');
-  //   final res = await http.get(url).then((response) => convert.json.decode(response.body));
-  //   print(res['results']);
-
-  //   List<Pokemon> pokemons = [];
-  //   for (var i = 0; i < res['results'].length; i++) {
-  //     var pokeResult = res['results'][i];
-  //     final pokeDetails = await http
-  //         .get(Uri.parse(pokeResult['url']))
-  //         .then((response) => convert.json.decode(response.body));
-  //     pokemons.add(Pokemon.fromJson(pokeDetails));
-  //   }
-
-  //   print(pokemons);
-  //   return pokemons;
-  // }
-  //
   Future<Pokemon> getPokemonById(String id) async {
     final Uri url = Uri.https(baseUrl, '/api/v2/pokemon/$id/');
     final res = await http.get(url).then(
@@ -45,7 +27,6 @@ class PokemonProvider {
         .then((response) => PokemonPagination.fromJson(convert.json.decode(response.body)));
 
     final List<Future<SimplifiedPokemon>> futureList = res.results.map((e) async {
-      print(e);
       List<String> urlParts = e.url.split('/');
       String id = urlParts[urlParts.length - 2];
       String picture = officialArtWorkUrl + id + '.png';
